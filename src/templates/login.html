@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - LivestockLink</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username"><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Login">
-    </form>
-    <p>Don't have an account? <a href="/register">Register here</a>.</p>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">LivestockLink</a>
+        <div class="navbar-nav">
+            <a href="/login">Login</a>
+            <a href="/register" class="btn">Register</a>
+        </div>
+    </nav>
+    <div class="form-container">
+        <h1>Login</h1>
+        <form action="/login" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <input type="submit" value="Login">
+        </form>
+        <p>Don't have an account? <a href="/register">Register here</a>.</p>
+    </div>
 </body>
 </html>

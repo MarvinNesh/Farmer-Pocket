@@ -4,9 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LivestockLink Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Welcome to LivestockLink!</h1>
-    <a href="/login">Login</a> | <a href="/register">Register</a>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">LivestockLink</a>
+        <div class="navbar-nav">
+            <a href="/login">Login</a>
+            <a href="/register" class="btn">Register</a>
+        </div>
+    </nav>
+
+    <div class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ url_for('static', filename='images/cow-7395115_1280.jpg') }}');">
+        <h1>Empowering Smallholder Farmers</h1>
+        <p>Your complete livestock management solution.</p>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-widgets">
+            <div class="widget">
+                <img src="{{ url_for('static', filename='images/goat-4884605_1280.jpg') }}" alt="Goat">
+                <h3>Herd Tracking</h3>
+                <p>Log and monitor your animals with ease, even offline.</p>
+            </div>
+            <div class="widget">
+                <h3>Symptom Scanner</h3>
+                <p>Analyze photos for common diseases using AI.</p>
+            </div>
+            <div class="widget">
+                <h3>Outbreak Alerts</h3>
+                <p>Stay informed about local disease outbreaks.</p>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
