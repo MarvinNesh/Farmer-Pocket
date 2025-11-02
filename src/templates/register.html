@@ -7,25 +7,32 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <a href="/" class="navbar-brand">LivestockLink</a>
-        <div class="navbar-nav">
-            <a href="/login">Login</a>
-            <a href="/register" class="btn">Register</a>
+    <div class="auth-container">
+        <div class="auth-panel branding-panel">
+            <h1>Join Us!</h1>
+            <p>Create an account to start managing your livestock like a pro.</p>
         </div>
-    </nav>
-    <div class="form-container">
-        <h1>Register</h1>
-        <form action="/register" method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <input type="submit" value="Register">
-        </form>
-        <p>Already have an account? <a href="/login">Login here</a>.</p>
+        <div class="auth-panel form-panel">
+            <div class="form-container">
+                <h1>Create Account</h1>
+                <form action="/register" method="post">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Register</button>
+                </form>
+                <p class="auth-switch">Already have an account? <a href="/login">Login here</a>.</p>
+            </div>
+        </div>
     </div>
 </body>
 </html>
