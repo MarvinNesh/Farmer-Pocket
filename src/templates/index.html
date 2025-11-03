@@ -18,11 +18,10 @@
     </nav>
 
     <header class="hero">
-        <!-- Find a royalty-free video of a farm/landscape and add it to static/videos/bg.mp4 -->
-        <video playsinline autoplay muted loop id="bg-video">
-            <source src="{{ url_for('static', filename='videos/bg.mp4') }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+        <div class="slideshow-container">
+            <div class="slide" style="background-image: url('{{ url_for('static', filename='images/cow-7395115_1280.jpg') }}');"></div>
+            <div class="slide" style="background-image: url('{{ url_for('static', filename='images/goat-4884605_1280.jpg') }}');"></div>
+        </div>
         <div class="hero-content">
             <h1>Revolutionizing Livestock Management</h1>
             <p>Smart, simple, and effective tools for the modern farmer.</p>
