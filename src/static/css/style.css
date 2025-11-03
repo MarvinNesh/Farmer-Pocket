@@ -13,54 +13,7 @@ body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--light-gray);
     color: var(--dark-gray);
-    margin: 0;
     line-height: 1.6;
-}
-
-/* --- Navigation Bar --- */
-.navbar {
-    background-color: var(--white);
-    padding: 1rem 2rem;
-    box-shadow: var(--box-shadow);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.navbar-brand {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.navbar-nav a {
-    text-decoration: none;
-    color: var(--dark-gray);
-    margin-left: 1.5rem;
-    font-weight: 400;
-    transition: color 0.3s ease;
-}
-
-.navbar-nav a:hover {
-    color: var(--primary-color);
-}
-
-.navbar-nav a.btn {
-    background: linear-gradient(45deg, var(--primary-color), #4a9a6a);
-    color: var(--white);
-    padding: 0.6rem 1.2rem;
-    border-radius: 50px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.navbar-nav a.btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    color: var(--white);
 }
 
 /* --- Hero Section with Image Slideshow --- */
@@ -137,23 +90,6 @@ body {
 }
 
 /* --- Feature Widgets --- */
-.container {
-    padding: 4rem 2rem;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
-    color: var(--primary-color);
-}
-
-.dashboard-widgets {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-}
-
 .widget {
     background-color: var(--white);
     border-radius: 15px;
@@ -161,6 +97,7 @@ body {
     padding: 2rem;
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 1rem;
 }
 
 .widget:hover {
@@ -181,93 +118,27 @@ body {
 }
 
 /* --- Auth Page (Login/Register) --- */
-.auth-container {
-    display: flex;
-    min-height: 100vh;
-    align-items: center;
-    justify-content: center;
+.login {
+  min-height: 100vh;
 }
 
-.auth-panel {
-    flex: 1;
-    padding: 3rem;
+.bg-image {
+  background-image: url('https://source.unsplash.com/random?livestock');
+  background-size: cover;
+  background-position: center;
 }
 
-.auth-panel.form-panel {
-    background-color: var(--white);
+.login-heading {
+  font-weight: 300;
 }
 
-.auth-panel.branding-panel {
-    background: linear-gradient(45deg, var(--primary-color), #4a9a6a);
-    color: var(--white);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.branding-panel h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.form-container {
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.form-container h1 {
-    color: var(--primary-color);
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.btn-submit {
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    border-radius: 5px;
-    background: linear-gradient(45deg, var(--primary-color), #4a9a6a);
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.btn-submit:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.auth-switch {
-    text-align: center;
-    margin-top: 1.5rem;
+.btn-login {
+  font-size: 0.9rem;
+  letter-spacing: 0.05rem;
+  padding: 0.75rem 1rem;
 }
 
 @media (max-width: 768px) {
-    .auth-container {
-        flex-direction: column;
-    }
     .hero-content h1 {
         font-size: 2.5rem;
     }
