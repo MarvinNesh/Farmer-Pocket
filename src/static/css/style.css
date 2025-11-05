@@ -17,7 +17,8 @@ body {
     line-height: 1.6;
 }
 
-#livestock-app .navbar {
+/* --- Navigation Bar --- */
+.navbar {
     background-color: var(--white);
     padding: 1rem 2rem;
     box-shadow: var(--box-shadow);
@@ -26,54 +27,30 @@ body {
     z-index: 1000;
 }
 
-#livestock-app .navbar-toggler {
-    border: none;
-}
-
-#livestock-app .navbar-toggler:focus {
-    box-shadow: none;
-}
-
-#livestock-app .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(44, 94, 63, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-}
-
-#livestock-app .navbar-brand {
+.navbar-brand {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary-color);
     text-decoration: none;
 }
 
-#livestock-app .navbar-nav .nav-link {
+.navbar-nav .nav-item {
+    margin-left: 0.5rem;
+}
+
+.navbar-nav a {
+    text-decoration: none;
     color: var(--dark-gray);
     margin-left: 1.5rem;
     font-weight: 400;
     transition: color 0.3s ease;
 }
 
-#livestock-app .navbar-nav .nav-link:hover {
+.navbar-nav a:hover {
     color: var(--primary-color);
 }
 
-#livestock-app .navbar-nav .nav-item {
-    display: flex;
-    align-items: center;
-    margin-left: 0.5rem;
-}
-
-#livestock-app .navbar-nav a {
-    text-decoration: none;
-    color: var(--dark-gray);
-    font-weight: 400;
-    transition: color 0.3s ease;
-}
-
-#livestock-app .navbar-nav a:hover {
-    color: var(--primary-color);
-}
-
-#livestock-app .navbar-nav a.btn {
+.navbar-nav a.btn {
     background: linear-gradient(45deg, var(--primary-color), #4a9a6a);
     color: var(--white);
     padding: 0.6rem 1.2rem;
@@ -81,13 +58,25 @@ body {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-#livestock-app .navbar-nav a.btn:hover {
+.navbar-nav a.btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     color: var(--white);
 }
 
-#livestock-app .hero {
+/* Styles for mobile dropdown */
+@media (max-width: 991.98px) {
+    .navbar-nav .nav-item {
+        padding: 0.5rem 0;
+    }
+    .navbar-nav a.btn {
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* --- Hero Section with Image Slideshow --- */
+.hero {
     position: relative;
     height: 70vh;
     display: flex;
@@ -98,7 +87,7 @@ body {
     overflow: hidden;
 }
 
-#livestock-app .slideshow-container {
+.slideshow-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -107,7 +96,7 @@ body {
     z-index: -2;
 }
 
-#livestock-app .slide {
+.slide {
     position: absolute;
     top: 0;
     left: 0;
@@ -120,11 +109,11 @@ body {
     -webkit-animation: fade 12s infinite;
 }
 
-#livestock-app .slide:nth-child(1) {
+.slide:nth-child(1) {
     animation-delay: 0s;
 }
 
-#livestock-app .slide:nth-child(2) {
+.slide:nth-child(2) {
     animation-delay: 6s;
 }
 
@@ -136,7 +125,7 @@ body {
     100% { opacity: 0; }
 }
 
-#livestock-app .hero::after {
+.hero::after {
     content: '';
     position: absolute;
     top: 0;
@@ -147,36 +136,37 @@ body {
     z-index: -1;
 }
 
-#livestock-app .hero-content h1 {
+.hero-content h1 {
     font-size: 4rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
 }
 
-#livestock-app .hero-content p {
+.hero-content p {
     font-size: 1.5rem;
     font-weight: 300;
 }
 
-#livestock-app .container {
+/* --- Feature Widgets --- */
+.container {
     padding: 4rem 2rem;
 }
 
-#livestock-app .section-title {
+.section-title {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 3rem;
     color: var(--primary-color);
 }
 
-#livestock-app .dashboard-widgets {
+.dashboard-widgets {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
 }
 
-#livestock-app .widget {
+.widget {
     background-color: var(--white);
     border-radius: 15px;
     box-shadow: var(--box-shadow);
@@ -185,43 +175,41 @@ body {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-#livestock-app .widget:hover {
+.widget:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.15);
 }
 
-#livestock-app .widget .icon {
+.widget .icon {
     font-size: 4rem;
     color: var(--primary-color);
     margin-bottom: 1rem;
 }
 
-#livestock-app .widget h3 {
+.widget h3 {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
     color: var(--dark-gray);
 }
 
-#livestock-app .auth-container {
+/* --- Auth Page (Login/Register) --- */
+.auth-container {
     display: flex;
     min-height: 100vh;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
 }
 
-#livestock-app .auth-panel {
+.auth-panel {
     flex: 1;
     padding: 3rem;
 }
 
-#livestock-app .auth-panel.form-panel {
+.auth-panel.form-panel {
     background-color: var(--white);
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-#livestock-app .auth-panel.branding-panel {
+.auth-panel.branding-panel {
     background: linear-gradient(45deg, var(--primary-color), #4a9a6a);
     color: var(--white);
     text-align: center;
@@ -231,34 +219,33 @@ body {
     align-items: center;
 }
 
-#livestock-app .branding-panel h1 {
+.branding-panel h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
 }
 
-#livestock-app .form-container {
+.form-container {
     max-width: 400px;
     margin: 0 auto;
-    width: 100%;
 }
 
-#livestock-app .form-container h1 {
+.form-container h1 {
     color: var(--primary-color);
     text-align: center;
     margin-bottom: 2rem;
 }
 
-#livestock-app .form-group {
+.form-group {
     margin-bottom: 1.5rem;
 }
 
-#livestock-app .form-group label {
+.form-group label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
 }
 
-#livestock-app .form-group input {
+.form-group input {
     width: 100%;
     padding: 0.8rem;
     border: 1px solid #ccc;
@@ -266,7 +253,7 @@ body {
     box-sizing: border-box;
 }
 
-#livestock-app .btn-submit {
+.btn-submit {
     width: 100%;
     padding: 1rem;
     border: none;
@@ -279,59 +266,24 @@ body {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-#livestock-app .btn-submit:hover {
+.btn-submit:hover {
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-#livestock-app .auth-switch {
+.auth-switch {
     text-align: center;
     margin-top: 1.5rem;
 }
 
-#livestock-app .flash-message {
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 5px;
-    text-align: center;
-    color: #721c24;
-    background-color: #f8d7da;
-}
-
-@media (max-width: 991.98px) {
-    #livestock-app .navbar-nav {
-        align-items: flex-start;
-        margin-top: 1rem;
-    }
-
-    #livestock-app .navbar-nav .nav-item {
-        margin-left: 0;
-        width: 100%;
-    }
-
-    #livestock-app .navbar-nav a.btn,
-    #livestock-app .navbar-nav .nav-link {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 0.5rem;
-    }
-}
-
 @media (max-width: 768px) {
-    #livestock-app .navbar-brand {
-        font-size: 1.5rem; /* Reduce font size on smaller screens */
-    }
-
-    #livestock-app .auth-container {
+    .auth-container {
         flex-direction: column;
     }
-    #livestock-app .hero-content h1 {
+    .hero-content h1 {
         font-size: 2.5rem;
     }
-    #livestock-app .hero-content p {
+    .hero-content p {
         font-size: 1.2rem;
-    }
-    #livestock-app .auth-panel.branding-panel {
-        min-height: 30vh;
     }
 }
