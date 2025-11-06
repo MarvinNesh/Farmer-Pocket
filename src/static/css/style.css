@@ -303,6 +303,18 @@ body {
     text-align: center;
 }
 
+#image-preview {
+    margin-bottom: 1.5rem;
+    display: none; /* Hidden by default */
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    border: 3px solid var(--primary-color);
+}
+
 .upload-label {
     display: inline-block;
     padding: 2rem;
@@ -325,6 +337,19 @@ body {
 
 #image-upload {
     display: none;
+}
+
+.btn-submit.ready {
+    background: linear-gradient(45deg, var(--secondary-color), #f9a825); /* Gold gradient */
+    color: var(--dark-gray);
+    font-weight: 700;
+}
+
+.btn-submit:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 @media (max-width: 768px) {
