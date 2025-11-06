@@ -10,14 +10,44 @@
     <div class="scanner-container">
         <form action="{{ url_for('scanner.scanner') }}" method="post" enctype="multipart/form-data">
             <div class="form-group">
+                <div id="image-preview"></div>
                 <label for="image-upload" class="upload-label">
                     <i class="fas fa-cloud-upload-alt"></i>
-                    <span>Choose an Image</span>
+                    <span id="upload-text">Choose an Image</span>
                 </label>
                 <input type="file" id="image-upload" name="image" accept="image/*" required>
             </div>
-            <button type="submit" class="btn-submit">Analyze Image</button>
+            <button type="submit" class="btn-submit" id="analyze-btn" disabled>Analyze Image</button>
         </form>
     </div>
 </div>
+
+<script>
+document.getElementById('image-upload').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        
+        const reader = new FileReader();
+        const previewContainer = document.getElementById('image-preview');
+        
+        reader.onload = function(e) {
+            previewContainer.innerHTML = ''; 
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.classList.add('preview-image');
+            previewContainer.appendChild(img);
+            previewContainer.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+
+        
+        document.getElementById('upload-text').textContent = file.name;
+
+        
+        const analyzeBtn = document.getElementById('analyze-btn');
+        analyzeBtn.disabled = false;
+        analyzeBtn.classList.add('ready');
+    }
+});
+</script>
 {% endblock %}
