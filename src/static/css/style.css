@@ -192,6 +192,22 @@ body {
     color: var(--dark-gray);
 }
 
+.widget .btn-details {
+    margin-top: 1rem;
+    display: inline-block;
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.widget .btn-details:hover {
+    background: #1e462f; /* Darker green */
+    color: var(--white);
+}
+
 /* --- Auth Page (Login/Register) --- */
 .auth-container {
     display: flex;
@@ -274,6 +290,41 @@ body {
 .auth-switch {
     text-align: center;
     margin-top: 1.5rem;
+}
+
+/* --- Scanner Page --- */
+.scanner-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--white);
+    box-shadow: var(--box-shadow);
+    border-radius: 15px;
+    text-align: center;
+}
+
+.upload-label {
+    display: inline-block;
+    padding: 2rem;
+    border: 2px dashed var(--primary-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.upload-label:hover {
+    background-color: #f0fff0;
+}
+
+.upload-label i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 1rem;
+}
+
+#image-upload {
+    display: none;
 }
 
 @media (max-width: 768px) {
