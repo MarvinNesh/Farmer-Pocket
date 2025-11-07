@@ -363,3 +363,31 @@ body {
         font-size: 1.2rem;
     }
 }
+
+
+/* Moving Panel for 'Did You Know' facts */
+.moving-panel {
+    background-color: #f8f9fa; /* A light grey background */
+    color: #212529; /* Dark text for contrast */
+    padding: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem; /* Adds some space below the panel */
+}
+
+.moving-panel p {
+    display: inline-block;
+    padding-left: 100%;
+    margin: 0;
+    animation: move-left 25s linear infinite;
+}
+
+@keyframes move-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}

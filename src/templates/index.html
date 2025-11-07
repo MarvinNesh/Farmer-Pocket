@@ -3,15 +3,21 @@
 {% block title %}Welcome to LivestockLink{% endblock %}
 
 {% block content %}
-    <div class="flash-messages container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages container">
                 {% for category, message in messages %}
                     <div class="alert alert-{{ category }}">{{ message }}</div>
                 {% endfor %}
-            {% endif %}
-        {% endwith %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if fact %}
+    <div class="moving-panel">
+        <p>{{ fact }}</p>
     </div>
+    {% endif %}
 
     <header class="hero">
         <div class="slideshow-container">

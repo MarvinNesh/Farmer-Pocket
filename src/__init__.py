@@ -31,7 +31,21 @@ def create_app():
     @app.route('/')
     def dashboard():
         """lending page"""
-        return render_template('index.html')
+        fact = None
+        try:
+            import google.generativeai as genai
+            api_key = os.environ.get("GEMINI_API_KEY")
+            if api_key:
+                genai.configure(api_key=api_key)
+                model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                prompt = "Tell me one interesting and surprising 'did you know' fact about livestock (e.g., cows, goats, sheep, chickens, pigs)."
+                response = model.generate_content(prompt)
+                fact = response.text
+        except Exception:
+            # If the API call fails  show this fact.\\\\
+            fact = "Did you know? Cows have an excellent sense of smell and can detect odors up to six miles away."
+
+        return render_template('index.html', fact=fact)
 
     with app.app_context():
         db.create_all()
