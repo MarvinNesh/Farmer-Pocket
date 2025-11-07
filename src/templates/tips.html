@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Farming Tips{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Farming Tips</h1>
+    <p class="text-center mb-5">Select an animal to get detailed farming and care tips.</p>
+
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="row">
+        {% for animal in animals %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ tips_data[animal].title }}</h5>
+                    <a href="{{ url_for('tips.tip_details', animal=animal) }}" class="btn btn-primary">Get Tips</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
