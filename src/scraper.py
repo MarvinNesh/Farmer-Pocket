@@ -142,3 +142,14 @@ def scrape_outbreaks():
         except Exception as e:
             log.error(f"An error occurred while processing link {i+1}: {e}", exc_info=True)
             continue 
+    if articles_found:
+            log.info("Committing new outbreaks to the database.")
+            try:
+                db.session.commit()
+                return "Outbreaks updated successfully!"
+            except Exception as e:
+                db.session.rollback()
+                return f"Error saving outbreaks to database: {e}"
+            else:
+                log.info("No new outbreak articles were found to add to the database.")
+                return "No new outbreak articles found."
