@@ -11,49 +11,22 @@ from .models import Outbreak
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
+
 def parse_date(date_str):
     """Parse date string like '27 February 2025' to datetime object."""
     try:
+        # Handle full month names
         date_obj = datetime.strptime(date_str, '%d %B %Y')
         return date_obj
     except ValueError:
         try:
+            # Handle abbreviated month names if needed
             date_obj = datetime.strptime(date_str, '%d %b %Y')
             return date_obj
         except ValueError:
             log.warning(f"Could not parse date: {date_str}")
             return None
-def extract_text_from_pdf(pdf_url):
-    """Extracts text content from a PDF file."""
-    try:
-        response = requests.get(pdf_url, verify=False)
-        response.raise_for_status()
-        with io.BytesIO(response.content) as open_pdf_file:
-            reader = PdfReader(open_pdf_file)
-            text = ""
-            for page in reader.pages:
-                text += page.extract_text() or ""
-            return text
-    except Exception as e:
-        log.error(f"Error extracting text from PDF {pdf_url}: {e}", exc_info=True)
-        return ""
 
-def extract_text_from_html(html_url):
-    """Extracts text content from an HTML page, trying multiple selectors."""
-    try:
-        response = requests.get(html_url, verify=False)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        content_selectors = ['article', 'main', 'div.content', 'div.item-page']
-        for selector in content_selectors:
-            article_body = soup.select_one(selector)
-            if article_body:
-                return article_body.get_text(separator='\n', strip=True)
-        return ""
-    except Exception as e:
-        log.error(f"Error extracting text from HTML {html_url}: {e}", exc_info=True)
-        return ""
 def scrape_outbreaks():
     """
     Scrapes the NDA website for outbreak news, extracts relevant information,
@@ -73,17 +46,24 @@ def scrape_outbreaks():
 
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    log.info("Looking for article links.")
-    pdf_links = soup.find_all('a', href=re.compile(r'\.pdf$'))
-    log.info(f"Found {len(pdf_links)} potential PDF article links.")
+  
+    
+    # Do not clear the database; make it incremental
+    # try:
+    #     log.info("Clearing existing outbreak data from the database.")
+    #     db.session.query(Outbreak).delete()
+    #     db.session.commit()
+    #     log.info("Database cleared.")
+    # except Exception as e:
+    #     db.session.rollback()
+    #     log.error(f"Error clearing database: {e}")
+    #     return f"Error clearing database: {e}"
 
-    keywords = [
-        'outbreak', 'disease', 'foot and mouth', 
-        'avian influenza', 'anthrax', 'rabies', 'brucellosis', 'fmd'
-    ]
+    # Determine the cutoff date: all from 2024 onwards for initial population
     cutoff_year = 2024
     cutoff_date = datetime(cutoff_year, 1, 1)
 
+    # Get the latest date in DB if exists, else use cutoff
     latest_db_date = None
     try:
         latest_outbreak = db.session.query(Outbreak).order_by(Outbreak.date.desc()).first()
@@ -99,12 +79,20 @@ def scrape_outbreaks():
         log.info("Using 2024 cutoff.")
 
     articles_found = False
+    
+    log.info("Looking for article links.")
+    # Updated selector: Find all <a> tags that link to PDFs in media releases
+    pdf_links = soup.find_all('a', href=re.compile(r'\.pdf$'))
+    log.info(f"Found {len(pdf_links)} potential PDF article links.")
+
+    keywords = ['outbreak', 'disease', 'foot and mouth', 'avian influenza', 'anthrax', 'rabies', 'brucellosis', 'fmd']
+
     for i, a_element in enumerate(pdf_links):
         log.info(f"Processing link {i+1}...")
         try:
             title_text = a_element.get_text(strip=True)
             
-            # Updated regex: "DD Month YYYY: Title"
+            # Updated regex: No brackets, "DD Month YYYY: Title"
             match = re.match(r'(\d{1,2} \w+ \d{4}): (.*)', title_text)
             if not match:
                 log.info(f"Skipping link {i+1}: Invalid title format - {title_text[:50]}...")
@@ -141,15 +129,48 @@ def scrape_outbreaks():
                 log.info(f"Skipping link {i+1}: Already exists in DB")
         except Exception as e:
             log.error(f"An error occurred while processing link {i+1}: {e}", exc_info=True)
-            continue 
+            continue
+
     if articles_found:
-            log.info("Committing new outbreaks to the database.")
-            try:
-                db.session.commit()
-                return "Outbreaks updated successfully!"
-            except Exception as e:
-                db.session.rollback()
-                return f"Error saving outbreaks to database: {e}"
-            else:
-                log.info("No new outbreak articles were found to add to the database.")
-                return "No new outbreak articles found."
+        log.info("Committing new outbreaks to the database.")
+        try:
+            db.session.commit()
+            return "Outbreaks updated successfully!"
+        except Exception as e:
+            db.session.rollback()
+            return f"Error saving outbreaks to database: {e}"
+    else:
+        log.info("No new outbreak articles were found to add to the database.")
+        return "No new outbreak articles found."
+
+def extract_text_from_pdf(pdf_url):
+    """Extracts text content from a PDF file."""
+    try:
+        response = requests.get(pdf_url, verify=False)
+        response.raise_for_status()
+        with io.BytesIO(response.content) as open_pdf_file:
+            reader = PdfReader(open_pdf_file)
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text() or ""
+            return text
+    except Exception as e:
+        log.error(f"Error extracting text from PDF {pdf_url}: {e}", exc_info=True)
+        return ""
+
+def extract_text_from_html(html_url):
+    """Extracts text content from an HTML page, trying multiple selectors."""
+    try:
+        response = requests.get(html_url, verify=False)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        content_selectors = ['article', 'main', 'div.content', 'div.item-page']
+        for selector in content_selectors:
+            article_body = soup.select_one(selector)
+            if article_body:
+                return article_body.get_text(separator='\n', strip=True)
+        return ""
+    except Exception as e:
+        log.error(f"Error extracting text from HTML {html_url}: {e}", exc_info=True)
+        return ""
