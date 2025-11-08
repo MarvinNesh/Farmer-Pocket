@@ -54,3 +54,21 @@ def extract_text_from_html(html_url):
     except Exception as e:
         log.error(f"Error extracting text from HTML {html_url}: {e}", exc_info=True)
         return ""
+def scrape_outbreaks():
+    """
+    Scrapes the NDA website for outbreak news, extracts relevant information,
+    and stores it in the Outbreak database model.
+    """
+    log.info("Starting outbreak scraping process.")
+    url = "https://www.nda.gov.za/index.php/newsroom/media-release"
+    try:
+        log.info(f"Fetching URL: {url}")
+        # Disable SSL verification for local development
+        response = requests.get(url, verify=False)
+        response.raise_for_status()
+        log.info("Successfully fetched URL.")
+    except requests.exceptions.RequestException as e:
+        log.error(f"Error fetching the URL: {e}")
+        return f"Error fetching the URL: {e}"
+
+    soup = BeautifulSoup(response.content, 'html.parser')
