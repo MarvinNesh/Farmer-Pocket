@@ -99,3 +99,46 @@ def scrape_outbreaks():
         log.info("Using 2024 cutoff.")
 
     articles_found = False
+    for i, a_element in enumerate(pdf_links):
+        log.info(f"Processing link {i+1}...")
+        try:
+            title_text = a_element.get_text(strip=True)
+            
+            # Updated regex: "DD Month YYYY: Title"
+            match = re.match(r'(\d{1,2} \w+ \d{4}): (.*)', title_text)
+            if not match:
+                log.info(f"Skipping link {i+1}: Invalid title format - {title_text[:50]}...")
+                continue
+            
+            date_str = match.group(1)
+            title = match.group(2)
+            
+            date_obj = parse_date(date_str)
+            if not date_obj or date_obj < cutoff_date:
+                log.info(f"Skipping link {i+1}: Date {date_str} is before cutoff {cutoff_date.date()}")
+                continue
+            
+            if not any(keyword in title.lower() for keyword in keywords):
+                log.info(f"Skipping link {i+1}: No relevant keywords in title - {title[:50]}...")
+                continue
+
+            link = urljoin(url, a_element['href'])
+            
+            content = extract_text_from_pdf(link)
+
+            existing_outbreak = Outbreak.query.filter_by(url=link).first()
+            if not existing_outbreak:
+                new_outbreak = Outbreak(
+                    title=title,
+                    date=date_str,
+                    content=content,
+                    url=link
+                )
+                db.session.add(new_outbreak)
+                articles_found = True
+                log.info(f"Added outbreak: {title[:50]}...")
+            else:
+                log.info(f"Skipping link {i+1}: Already exists in DB")
+        except Exception as e:
+            log.error(f"An error occurred while processing link {i+1}: {e}", exc_info=True)
+            continue 
