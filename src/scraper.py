@@ -81,3 +81,21 @@ def scrape_outbreaks():
         'outbreak', 'disease', 'foot and mouth', 
         'avian influenza', 'anthrax', 'rabies', 'brucellosis', 'fmd'
     ]
+    cutoff_year = 2024
+    cutoff_date = datetime(cutoff_year, 1, 1)
+
+    latest_db_date = None
+    try:
+        latest_outbreak = db.session.query(Outbreak).order_by(Outbreak.date.desc()).first()
+        if latest_outbreak:
+            latest_db_date = parse_date(latest_outbreak.date)
+            if latest_db_date:
+                log.info(f"Latest date in DB: {latest_outbreak.date}")
+                cutoff_date = max(cutoff_date, latest_db_date)
+            else:
+                log.info("Using 2024 cutoff since DB dates could not be parsed.")
+    except Exception as e:
+        log.error(f"Error querying latest date: {e}")
+        log.info("Using 2024 cutoff.")
+
+    articles_found = False
