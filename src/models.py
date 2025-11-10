@@ -13,3 +13,13 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class Outbreak(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    date = db.Column(db.String(50), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    url = db.Column(db.String(200), nullable=False, unique=True)
+
+    def __repr__(self):
+        return f'<Outbreak {self.title}>'
