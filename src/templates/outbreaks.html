@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Livestock Outbreaks{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Animal Disease Outbreaks</h1>
+    <div class="text-center mb-4">
+        <a href="{{ url_for('admin.update_outbreaks') }}" class="btn btn-primary">Update Outbreaks from Source</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="list-group">
+        {% if outbreaks %}
+            {% for outbreak in outbreaks %}
+                <a href="{{ url_for('outbreaks.outbreak_details', outbreak_id=outbreak.id) }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ outbreak.title }}</h5>
+                        <small>{{ outbreak.date }}</small>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                No outbreak articles found. Try updating from the source.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
