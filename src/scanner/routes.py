@@ -70,4 +70,12 @@ def analyze_image(image_path):
             'Coccidiosis': 'Coccidiosis suspected (bloody droppings?). Treat with anticoccidials (e.g., Amprolium from co-op). Clean coop, avoid overcrowding. Common in wet seasons—consult local vet.',
             'Salmonella': 'Salmonella alert (diarrhea/green droppings?). Quarantine, use antibiotics via vet prescription. Report to DAFF for flock testing. Prevent via clean water/feed.'
         }
+        recommendation = recs.get(diagnosis, 'Consult a vet for further tests.')
         
+        return {
+            'diagnosis': diagnosis,
+            'confidence': f"{confidence:.2%}",
+            'recommendation': recommendation
+        }
+    
+    
