@@ -16,3 +16,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+MODEL_PATH = 'poultry_disease_model.tflite'  
+LABELS_PATH = 'imagenet_labels.txt' 
+
+
+
