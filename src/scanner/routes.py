@@ -38,4 +38,17 @@ def analyze_image(image_path):
     image_normalized = image_resized.astype(np.float32) / 255.0
     input_tensor = np.expand_dims(image_normalized, axis=0)
     
-   
+    try:
+        interpreter = Interpreter(model_path=MODEL_PATH)
+        interpreter.allocate_tensors()
+        input_details = interpreter.get_input_details()
+        output_details = interpreter.get_output_details()
+        
+        interpreter.set_tensor(input_details[0]['index'], input_tensor)
+        interpreter.invoke()
+        output_data = interpreter.get_tensor(output_details[0]['index'])
+        
+        
+        labels = ['Coccidiosis', 'Healthy', 'Newcastle', 'Salmonella']
+        
+       
