@@ -29,4 +29,13 @@ def analyze_image(image_path):
     if image is None:
         return {'diagnosis': 'Error: Invalid image', 'confidence': '0%', 'recommendation': 'Try uploading again.'}
     
+    # Convert BGR to RGB
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     
+    # Resize to model input size (224x224)
+    input_size = 224
+    image_resized = cv2.resize(image, (input_size, input_size))
+    image_normalized = image_resized.astype(np.float32) / 255.0
+    input_tensor = np.expand_dims(image_normalized, axis=0)
+    
+   
