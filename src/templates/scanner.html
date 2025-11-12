@@ -8,7 +8,7 @@
     <p class="text-center">Upload an image of your animal to check for common symptoms.</p>
     
     <div class="scanner-container">
-        <form action="{{ url_for('scanner.scanner') }}" method="post" enctype="multipart/form-data">
+        <form id="upload-form" enctype="multipart/form-data">
             <div class="form-group">
                 <div id="image-preview"></div>
                 <label for="image-upload" class="upload-label">
@@ -19,35 +19,124 @@
             </div>
             <button type="submit" class="btn-submit" id="analyze-btn" disabled>Analyze Image</button>
         </form>
+        
+        <!-- New: Results display area -->
+        <div id="results-container" style="display: none; margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+            <h3>Analysis Results</h3>
+            <div id="results-content"></div>
+            <button id="new-scan-btn" class="btn-secondary" style="margin-top: 10px;">Scan Another Image</button>
+        </div>
     </div>
 </div>
 
+<style>
+    #image-preview { display: none; margin: 10px 0; text-align: center; }
+    .preview-image { max-width: 300px; max-height: 300px; border: 1px solid #ccc; border-radius: 5px; }
+    .upload-label { display: block; padding: 50px; border: 2px dashed #ccc; border-radius: 10px; cursor: pointer; transition: border-color 0.3s; }
+    .upload-label:hover { border-color: #007bff; }
+    .btn-submit { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    .btn-submit:disabled { background-color: #6c757d; cursor: not-allowed; }
+    .btn-submit.ready { background-color: #007bff; }
+    .btn-secondary { background-color: #6c757d; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
+    .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .diagnosis { font-weight: bold; color: #dc3545; } /* Red for diseased; green for healthy via JS */
+    .confidence { font-size: 0.9em; color: #666; }
+    .recommendation { margin-top: 10px; padding: 10px; background-color: #e7f3ff; border-left: 4px solid #007bff; }
+</style>
+
 <script>
-document.getElementById('image-upload').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        
-        const reader = new FileReader();
-        const previewContainer = document.getElementById('image-preview');
-        
-        reader.onload = function(e) {
-            previewContainer.innerHTML = ''; 
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.classList.add('preview-image');
-            previewContainer.appendChild(img);
-            previewContainer.style.display = 'block';
+document.addEventListener('DOMContentLoaded', function() {
+    const imageUpload = document.getElementById('image-upload');
+    const uploadText = document.getElementById('upload-text');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const uploadForm = document.getElementById('upload-form');
+    const resultsContainer = document.getElementById('results-container');
+    const resultsContent = document.getElementById('results-content');
+    const newScanBtn = document.getElementById('new-scan-btn');
+
+    // Your existing preview logic
+    imageUpload.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            const previewContainer = document.getElementById('image-preview');
+            
+            reader.onload = function(e) {
+                previewContainer.innerHTML = ''; 
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.classList.add('preview-image');
+                previewContainer.appendChild(img);
+                previewContainer.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+
+            uploadText.textContent = file.name;
+            analyzeBtn.disabled = false;
+            analyzeBtn.classList.add('ready');
         }
-        reader.readAsDataURL(file);
+    });
 
-        
-        document.getElementById('upload-text').textContent = file.name;
+    // New: Handle form submit with fetch (AJAX)
+    uploadForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const file = imageUpload.files[0];
+        if (!file) return;
 
-        
-        const analyzeBtn = document.getElementById('analyze-btn');
-        analyzeBtn.disabled = false;
-        analyzeBtn.classList.add('ready');
-    }
+        // Show loading
+        analyzeBtn.innerHTML = '<div class="loading"></div> Analyzing...';
+        analyzeBtn.disabled = true;
+        resultsContainer.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('file', file);  // Note: Backend expects 'file', but your input is 'image'—update backend to 'image' if preferred
+
+        try {
+            const response = await fetch('{{ url_for("scanner.scanner") }}', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Analysis failed');
+            }
+
+            const data = await response.json();
+
+            // Display results
+            const isHealthy = data.diagnosis.toLowerCase().includes('healthy');
+            resultsContent.innerHTML = `
+                <p><strong>Diagnosis:</strong> <span class="diagnosis" style="color: ${isHealthy ? '#28a745' : '#dc3545'}">${data.diagnosis}</span></p>
+                <p class="confidence"><strong>Confidence:</strong> ${data.confidence}</p>
+                <p class="recommendation"><strong>Recommendation:</strong> ${data.recommendation}</p>
+                <img src="/static/uploads/scanner/${data.filename}" alt="Analyzed Image" class="preview-image" style="margin-top: 10px;">
+            `;
+            resultsContainer.style.display = 'block';
+
+            // Multilingual hint (expand later)
+            if (navigator.language.startsWith('zu')) {  // isiZulu example
+                resultsContent.innerHTML += '<p><em>(In isiZulu: Ukuhlolwa kukhona.)</em></p>';
+            }
+        } catch (error) {
+            resultsContent.innerHTML = `<p style="color: #dc3545;">Error: ${error.message}. Please try again or check your connection. (Offline mode coming soon!)</p>`;
+            resultsContainer.style.display = 'block';
+        } finally {
+            analyzeBtn.innerHTML = 'Analyze Image';
+            analyzeBtn.disabled = false;
+            analyzeBtn.classList.remove('ready');
+        }
+    });
+
+    // New scan button: Reset form
+    newScanBtn.addEventListener('click', function() {
+        uploadForm.reset();
+        document.getElementById('image-preview').style.display = 'none';
+        uploadText.textContent = 'Choose an Image';
+        analyzeBtn.disabled = true;
+        analyzeBtn.classList.remove('ready');
+        resultsContainer.style.display = 'none';
+    });
 });
 </script>
 {% endblock %}
