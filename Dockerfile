@@ -10,9 +10,6 @@ RUN pip install --no-cache-dir -r requirements.prod.txt
 
 COPY . /app
 
-ENV FLASK_APP=run.py
-
 EXPOSE 8000
 
-# Run database migrations and start the application
-CMD ["sh", "-c", "flask db upgrade && gunicorn -w 1 --threads 2 --timeout 60 -b 0.0.0.0:8000 run:app"]
+CMD ["gunicorn", "--worker-class", "gevent", "--bind", "0.0.0.0:8000", "run:app"]
