@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.prod.txt
 
 COPY . /app
 
+ENV FLASK_APP=run.py
+
 EXPOSE 8000
 
 # Run database migrations and start the application
