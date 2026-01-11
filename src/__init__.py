@@ -1,47 +1,46 @@
 import os
-import random
 from flask import Flask, render_template
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager
+from dotenv import load_dotenv
+import google.generativeai as genai
+
 from .extensions import db, migrate
-from .models import User, Outbreak
-from .facts import facts as livestock_facts
-try:
-    import google.generativeai as genai
-except Exception:
-    genai = None
+from .models import User
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
 
+    # Load environment variables from .env file
+    load_dotenv()
 
-    if not os.path.exists(app.instance_path):
-        os.makedirs(app.instance_path)
+    database_url = os.getenv('DATABASE_URL')
+    secret_key = os.getenv('SECRET_KEY')
+    gemini_api_key = os.getenv('GEMINI_API_KEY')
 
-    data_dir = os.environ.get('FP_DATA_DIR', '/data')
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
-
-    db_path = os.path.join(data_dir, 'users.db')
-    # Prefer environment-configured database (e.g. DATABASE_URL or SQLALCHEMY_DATABASE_URI)
-    db_uri = os.environ.get('DATABASE_URL') or os.environ.get('SQLALCHEMY_DATABASE_URI') or f'sqlite:///{db_path}'
-    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-
-
-    secret_key = os.environ.get('SECRET_KEY')
+    if not database_url:
+        raise RuntimeError("DATABASE_URL is not set. Please configure it in your .env file or environment variables.")
     if not secret_key:
-        print("WARNING: SECRET_KEY environment variable not set. Using a default, insecure key for development.")
-        secret_key = '91df1453195d837ad743d920' # Default for development only
-    app.config['SECRET_KEY'] = secret_key
+        raise RuntimeError("SECRET_KEY is not set. Please configure it in your .env file or environment variables.")
 
-    # Configure Gemini API
-    gemini_api_key = os.environ.get("GEMINI_API_KEY")
-    if gemini_api_key and genai is not None:
-        genai.configure(api_key=gemini_api_key)
-    else:
-        if not gemini_api_key:
-            print("WARNING: GEMINI_API_KEY environment variable not set. The chatbot feature will not work.")
-        elif genai is None:
+    # Convert postgres:// to postgresql:// if needed
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+    app.config.from_mapping(
+        SECRET_KEY=secret_key,
+        SQLALCHEMY_DATABASE_URI=database_url,
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+    )
+
+    if gemini_api_key:
+        try:
+            genai.configure(api_key=gemini_api_key)
+        except ImportError:
             print("WARNING: google.generativeai package not installed. Chatbot disabled.")
+        except Exception as e:
+            print(f"WARNING: Gemini API key configuration failed: {e}. Chatbot disabled.")
+    else:
+        print("WARNING: GEMINI_API_KEY environment variable not set. The chatbot feature will not work.")
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -54,27 +53,23 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # Register Blueprints
     from .auth.routes import auth_bp
-    app.register_blueprint(auth_bp, url_prefix='/')
-
     from .scanner.routes import scanner_bp
-    app.register_blueprint(scanner_bp, url_prefix='/')
-
-    from .tips.routes import tips_bp
-    app.register_blueprint(tips_bp, url_prefix='/')
-
     from .outbreaks.routes import outbreaks_bp
-    app.register_blueprint(outbreaks_bp, url_prefix='/')
-
+    from .tips.routes import tips_bp
     from .chatbot.routes import chatbot_bp
-    app.register_blueprint(chatbot_bp, url_prefix='/')
-
     from .admin.routes import admin_bp
-    app.register_blueprint(admin_bp, url_prefix='/admin')
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(scanner_bp)
+    app.register_blueprint(outbreaks_bp)
+    app.register_blueprint(tips_bp)
+    app.register_blueprint(chatbot_bp)
+    app.register_blueprint(admin_bp)
 
     @app.route('/')
     def index():
-        fact = random.choice(livestock_facts)
-        return render_template('index.html', fact=fact)
+        return render_template('index.html')
 
     return app

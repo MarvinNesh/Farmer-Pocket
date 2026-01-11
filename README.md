@@ -13,5 +13,42 @@ This project addresses key challenges: 20% annual livestock losses from diseases
 - **Multilingual Support**: English, isiZulu, isiXhosa prompts (via simple string translations).
 - **Offline-First**: Uses SQLite for data persistence; syncs when online.
 
+## Deployment & Database
+
+Recommended deployment options:
+
+- Docker Compose (recommended): builds the app and a Postgres DB. See `docker-compose.yml`.
+- Platform (Heroku/GCP/Render): use `Procfile` and set `DATABASE_URL`.
+
+Quick steps to initialize the database when you can't run `flask db`:
+
+1. Install minimal deps locally (skip heavy ML deps if not needed right now):
+
+```bash
+python3 -m pip install --user --upgrade pip
+python3 -m pip install --user flask==3.0.3 flask-sqlalchemy==3.0.2 flask-migrate==4.0.4 psycopg2-binary==2.9.6 python-dotenv==1.0.0
+```
+
+2. To create tables without Alembic migrations, run:
+
+```bash
+cd /path/to/project
+python3 scripts/init_db.py
+```
+
+3. When you can install full requirements or use Docker, create real migrations:
+
+```bash
+export FLASK_APP=run.py
+flask db init
+flask db migrate -m "initial"
+flask db upgrade
+```
+
+Notes:
+- The app prefers `DATABASE_URL` or `SQLALCHEMY_DATABASE_URI` from environment and falls back to `resources/users.db` (SQLite).
+- For production use Postgres (see `docker-compose.yml`).
+
+
 Future expansions: Integrate with Hugging Face for advanced AI, Firebase for cloud sync, and Flutter for a native Android app.
 

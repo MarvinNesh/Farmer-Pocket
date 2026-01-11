@@ -3,9 +3,18 @@ import re
 import logging
 from urllib.parse import urljoin
 from datetime import datetime
-import requests
-from bs4 import BeautifulSoup
-from PyPDF2 import PdfReader
+try:
+    import requests
+except Exception:
+    requests = None
+try:
+    from bs4 import BeautifulSoup
+except Exception:
+    BeautifulSoup = None
+try:
+    from PyPDF2 import PdfReader
+except Exception:
+    PdfReader = None
 from .extensions import db
 from .models import Outbreak
 
@@ -36,6 +45,9 @@ def scrape_outbreaks():
     url = "https://www.nda.gov.za/index.php/newsroom/media-release"
     try:
         log.info(f"Fetching URL: {url}")
+        if requests is None or BeautifulSoup is None:
+            log.error("Required scraping libraries (requests/bs4) are not installed.")
+            return "Scraper unavailable: missing dependencies"
         # Disable SSL verification for local development
         response = requests.get(url, verify=False)
         response.raise_for_status()
@@ -135,6 +147,9 @@ def scrape_outbreaks():
 def extract_text_from_pdf(pdf_url):
     """Extracts text content from a PDF file."""
     try:
+        if requests is None or PdfReader is None:
+            log.error("PDF extraction libraries (requests/PyPDF2) are not installed.")
+            return ""
         response = requests.get(pdf_url, verify=False)
         response.raise_for_status()
         with io.BytesIO(response.content) as open_pdf_file:
@@ -150,6 +165,9 @@ def extract_text_from_pdf(pdf_url):
 def extract_text_from_html(html_url):
     """Extracts text content from an HTML page, trying multiple selectors."""
     try:
+        if requests is None or BeautifulSoup is None:
+            log.error("HTML extraction libraries (requests/bs4) are not installed.")
+            return ""
         response = requests.get(html_url, verify=False)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -163,3 +181,29 @@ def extract_text_from_html(html_url):
     except Exception as e:
         log.error(f"Error extracting text from HTML {html_url}: {e}", exc_info=True)
         return ""
+
+
+def run_scraper(app=None):
+    """Run the scraper inside a Flask application context.
+
+    If no `app` is provided, this will create one using the app factory
+    so the function can be executed from the CLI or a container entrypoint.
+    Returns the result string from `scrape_outbreaks()`.
+    """
+    if app is None:
+        try:
+            # import the application factory
+            from . import create_app
+        except Exception:
+            log.error("Could not import create_app(); ensure this module is run inside the project package.")
+            return "Scraper unavailable: cannot create app"
+        app = create_app()
+
+    with app.app_context():
+        return scrape_outbreaks()
+
+
+if __name__ == '__main__':
+    # Allow running the scraper directly inside the container for cron jobs
+    result = run_scraper()
+    print(result)

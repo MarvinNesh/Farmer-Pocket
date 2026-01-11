@@ -1,15 +1,24 @@
 import os
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+    genai_available = True
+except Exception:
+    genai = None
+    genai_available = False
+
 
 chatbot_bp = Blueprint("chatbot", __name__)
 
-# Configure Gemini once at the top
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-# Define the model globally (for efficiency)
-model = genai.GenerativeModel("gemini-2.0-flash")
+# Configure Gemini if available and env var present
+model = None
+if genai_available and os.getenv("GEMINI_API_KEY"):
+    try:
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        model = genai.GenerativeModel("gemini-2.0-flash")
+    except Exception:
+        model = None
 
 SYSTEM_PROMPT = """
 You are AgriBot, a specialized AI assistant for livestock farming. Your purpose is to provide accurate, practical, and easy-to-understand advice on raising healthy and productive livestock, including cattle, goats, and poultry (broilers).
@@ -35,6 +44,9 @@ def ask():
 
     if not user_message:
         return jsonify({"error": "No message provided"}), 400
+
+    if model is None:
+        return jsonify({"error": "Chatbot unavailable (Gemini not configured or package missing)."}), 503
 
     try:
         full_prompt = f"{SYSTEM_PROMPT}\n\nUser: {user_message}\nAgriBot:"

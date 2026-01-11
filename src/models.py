@@ -6,7 +6,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.Text)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -16,10 +16,10 @@ class User(UserMixin, db.Model):
 
 class Outbreak(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.Text, nullable=False)
     date = db.Column(db.String(50), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    url = db.Column(db.String(200), nullable=False, unique=True)
+    url = db.Column(db.Text, nullable=False, unique=True)
 
     def __repr__(self):
         return f'<Outbreak {self.title}>'

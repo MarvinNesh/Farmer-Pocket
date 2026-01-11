@@ -4,9 +4,18 @@ from werkzeug.utils import secure_filename
 import os
 import shutil
 from . import scanner_bp
-import cv2
-import numpy as np
-from tensorflow.lite.python.interpreter import Interpreter  
+try:
+    import cv2
+except Exception:
+    cv2 = None
+try:
+    import numpy as np
+except Exception:
+    np = None
+try:
+    from tensorflow.lite.python.interpreter import Interpreter
+except Exception:
+    Interpreter = None
 
 
 UPLOAD_FOLDER = 'static/uploads/scanner'  
@@ -24,6 +33,8 @@ LABELS_PATH = 'imagenet_labels.txt'
 
 def analyze_image(image_path):
     """Analyzes uploaded image for poultry disease symptoms using fine-tuned ML."""
+    if cv2 is None or np is None or Interpreter is None:
+        return {'diagnosis': 'Unavailable: scanner dependencies not installed', 'confidence': '0%', 'recommendation': 'Install OpenCV/TensorFlow or use Docker image with ML deps.'}
     # Load and preprocess image
     image = cv2.imread(image_path)
     if image is None:
