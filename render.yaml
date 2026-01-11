@@ -1,31 +1,21 @@
+databases:
+  - name: farmer-pocket-db
+    plan: free
+
 services:
   - type: web
     name: farmer-pocket
     env: docker
-    repo: https://github.com/YOUR_USERNAME/YOUR_REPONAME # Replace with your repo URL
+    repo: https://github.com/MarvinNesh/Farmer-Pocket
     plan: free
     healthCheckPath: /
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: farmer-pocket-db # Replace with your DB name if different
+          name: farmer-pocket-db
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: GEMINI_API_KEY
         sync: false
-  - type: pserv
-    name: farmer-pocket-db
-    env: postgres
-    plan: free
-    postgres:
-      version: "14"
-    disk:
-      name: postgres-data
-      sizeGB: 1
-
-  - type: job
-    name: db-migrate
-    env: docker
-    plan: free
-    startCommand: "flask db upgrade"
+    preDeployCommand: "flask db upgrade"
