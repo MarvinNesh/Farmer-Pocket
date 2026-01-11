@@ -1,24 +1,9 @@
 import os
+import requests
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
-try:
-    import google.generativeai as genai
-    genai_available = True
-except Exception:
-    genai = None
-    genai_available = False
-
 
 chatbot_bp = Blueprint("chatbot", __name__)
-
-# Configure Gemini if available and env var present
-model = None
-if genai_available and os.getenv("GEMINI_API_KEY"):
-    try:
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        model = genai.GenerativeModel("gemini-2.0-flash")
-    except Exception:
-        model = None
 
 SYSTEM_PROMPT = """
 You are AgriBot, a specialized AI assistant for livestock farming. Your purpose is to provide accurate, practical, and easy-to-understand advice on raising healthy and productive livestock, including cattle, goats, and poultry (broilers).
@@ -45,17 +30,36 @@ def ask():
     if not user_message:
         return jsonify({"error": "No message provided"}), 400
 
-    if model is None:
-        return jsonify({"error": "Chatbot unavailable (Gemini not configured or package missing)."}), 503
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        return jsonify({"error": "OpenRouter API key not configured."}), 503
 
     try:
-        full_prompt = f"{SYSTEM_PROMPT}\n\nUser: {user_message}\nAgriBot:"
+        payload = {
+            "model": "meta-llama/llama-3.1-8b-instruct",
+            "messages": [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_message}
+            ]
+        }
 
-        response = model.generate_content(full_prompt)
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
 
-        reply = response.text.strip() if response.text else "Sorry, I couldn't generate a response."
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            json=payload,
+            headers=headers,
+            timeout=30
+        )
+
+        response.raise_for_status()
+        reply = response.json()["choices"][0]["message"]["content"]
 
         return jsonify({"reply": reply})
+
     except Exception as e:
-        print(f"❌ Error generating response from Gemini: {e}")
-        return jsonify({"error": "Failed to get a response from the chatbot. Please try again later."}), 500
+        print(f"❌ Meta Llama error: {e}")
+        return jsonify({"error": "Failed to get a response from Meta Llama."}), 500
