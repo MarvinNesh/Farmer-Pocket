@@ -8,7 +8,9 @@ services:
     env: docker
     repo: https://github.com/MarvinNesh/Farmer-Pocket
     plan: free
-    healthCheckPath: /
+    healthCheck:
+      path: /
+      initialDelaySeconds: 120
     envVars:
       - key: DATABASE_URL
         fromDatabase:

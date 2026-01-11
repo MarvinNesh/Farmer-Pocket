@@ -12,4 +12,8 @@ COPY . /app
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--worker-class", "gevent", "--bind", "0.0.0.0:8000", "run:app"]
+# Define environment variable
+ENV FLASK_APP=run.py
+
+# Run the application
+CMD flask db upgrade && gunicorn --worker-class gevent --bind 0.0.0.0:8000 run:app
