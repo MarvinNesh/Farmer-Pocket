@@ -29,4 +29,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -f http://localhost:8000/ || exit 1
 
 # Run the start script
-CMD ["./start.sh"]
+CMD ./start.sh
