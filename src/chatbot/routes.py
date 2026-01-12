@@ -32,6 +32,14 @@ def ask():
     if not user_message:
         return jsonify({"error": "No message provided"}), 400
 
+    # Retrieve or initialize conversation history from the session
+    conversation_history = session.get('conversation_history', [])
+    if not conversation_history:
+        conversation_history = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+    # Add user message to history
+    conversation_history.append({"role": "user", "content": user_message})
+
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         return jsonify({"error": "OpenRouter API key not configured."}), 503
@@ -39,10 +47,7 @@ def ask():
     try:
         payload = {
             "model": "meta-llama/llama-3.1-8b-instruct",
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_message}
-            ]
+            "messages": conversation_history
         }
 
         headers = {
@@ -61,6 +66,10 @@ def ask():
 
         response.raise_for_status()
         reply = response.json()["choices"][0]["message"]["content"]
+
+        # Add assistant response to history and save it in the session
+        conversation_history.append({"role": "assistant", "content": reply})
+        session['conversation_history'] = conversation_history
 
         return jsonify({"reply": reply})
 
