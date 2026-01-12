@@ -1,9 +1,9 @@
 import os
 import requests
 import json
-from flask import Blueprint, render_template, request, jsonify
-from dotenv import load_dotenv
+from flask import Blueprint, render_template, request, jsonify, session
 from flask_login import login_required
+from dotenv import load_dotenv
 
 chatbot_bp = Blueprint("chatbot", __name__)
 
